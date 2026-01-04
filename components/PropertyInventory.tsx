@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 
 interface PropertyInventoryProps {
   properties: Property[];
-  onAddProperty: (prop: Omit<Property, 'id'>) => void;
+  // Fix: Updated type to match App.tsx signature which omits agentId (handled in App)
+  onAddProperty: (prop: Omit<Property, 'id' | 'agentId'>) => void;
   onUpdateProperty: (prop: Property) => void;
   onDeleteProperty: (id: string) => void;
 }
@@ -28,7 +29,6 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
   });
 
   const getBaseUrl = () => {
-    // This handles both normal domains and sandboxed environments (like blob URLs)
     return window.location.href.split('#')[0];
   };
 
@@ -83,8 +83,13 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
     };
 
     if (editingId) {
-      onUpdateProperty({ id: editingId, ...propData });
+      // Fix: Find existing property to preserve its agentId
+      const existingProp = properties.find(p => p.id === editingId);
+      if (existingProp) {
+        onUpdateProperty({ ...existingProp, ...propData });
+      }
     } else {
+      // Fix: propData now correctly matches Omit<Property, 'id' | 'agentId'>
       onAddProperty(propData);
     }
 
@@ -157,15 +162,13 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <button 
-                    onClick={() => {
-                      const url = `${getBaseUrl()}#/listing/${prop.id}`;
-                      window.open(url, '_blank');
-                    }}
-                    className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold text-center hover:bg-gray-200 transition-colors"
+                  <Link 
+                    to={`/listing/${prop.id}`}
+                    target="_blank"
+                    className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold text-center hover:bg-gray-200 transition-colors inline-flex items-center justify-center gap-1"
                   >
-                    <i className="fas fa-external-link-alt mr-1"></i> Preview LP
-                  </button>
+                    <i className="fas fa-external-link-alt text-[10px]"></i> Preview LP
+                  </Link>
                   <button 
                     onClick={() => {
                       const url = `${getBaseUrl()}#/listing/${prop.id}`;

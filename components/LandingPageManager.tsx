@@ -24,11 +24,6 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
     alert('Link Landing Page disalin ke clipboard!');
   };
 
-  const handlePreview = (id: string) => {
-    const url = `${getBaseUrl()}#/listing/${id}`;
-    window.open(url, '_blank');
-  };
-
   const handleEdit = (prop: Property) => {
     setEditingProp(prop);
     setIsModalOpen(true);
@@ -112,13 +107,14 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
                         >
                           <i className="fas fa-link text-xs"></i>
                         </button>
-                        <button 
-                          onClick={() => handlePreview(prop.id)}
+                        <Link 
+                          to={`/listing/${prop.id}`}
+                          target="_blank"
                           className="p-2 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-all"
                           title="Buka Landing Page"
                         >
                           <i className="fas fa-external-link-alt text-xs"></i>
-                        </button>
+                        </Link>
                         <button 
                           onClick={() => handleEdit(prop)}
                           className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all"
@@ -143,7 +139,6 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
         </div>
       </div>
 
-      {/* Edit Content Modal (Simplified CRUD Update) */}
       {isModalOpen && editingProp && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-slideUp">
