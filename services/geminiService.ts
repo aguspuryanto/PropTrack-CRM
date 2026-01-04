@@ -10,23 +10,24 @@ export const generateFollowUpMessage = async (lead: Lead, property: Property) =>
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Buatkan pesan WhatsApp follow-up yang profesional dan ramah dalam Bahasa Indonesia.
+      contents: `Bertindaklah sebagai agen properti elit dan ramah. Buatkan pesan WhatsApp follow-up dalam Bahasa Indonesia.
       
-      Detail Lead:
+      Konteks Lead:
       Nama: ${lead.name}
-      Status Terakhir: ${lead.status}
+      Minat: ${property.title} di ${property.location}
+      Status: ${lead.status}
       Catatan: ${lead.notes}
       
-      Detail Properti:
-      Nama: ${property.title}
-      Lokasi: ${property.location}
-      Harga: Rp ${property.price.toLocaleString()}
-      
-      Tujuannya adalah mengajak lead untuk menjadwalkan kunjungan lokasi atau bertanya lebih lanjut.
-      Gunakan bahasa yang persuasif namun tidak memaksa. Sertakan emoji yang relevan.`,
+      Instruksi Pesan:
+      1. Sapa dengan nama secara personal.
+      2. Berikan "pancingan" emosional tentang unit tersebut (misal: "Unit ini sangat diminati karena lokasinya yang strategis").
+      3. Ajak untuk menjadwalkan kunjungan (site visit) minggu ini.
+      4. Gunakan gaya bahasa yang sopan, profesional, namun "warm".
+      5. Akhiri dengan pertanyaan terbuka agar mereka merespons.
+      6. Tambahkan emoji yang relevan secara proporsional.`,
     });
     
-    return response.text || `Halo ${lead.name}, saya agen properti Anda. Bagaimana pendapat Anda mengenai ${property.title}? Apakah ada yang bisa saya bantu lebih lanjut?`;
+    return response.text || `Halo ${lead.name}, saya Rizky dari PropTrack. Bagaimana kabar Anda? Saya ingin menginfokan bahwa unit ${property.title} sedang banyak diminati minggu ini. Kapan ada waktu untuk kita lihat unitnya bersama?`;
   } catch (error) {
     console.error("Error generating message:", error);
     return `Halo ${lead.name}, saya agen properti Anda. Bagaimana pendapat Anda mengenai ${property.title}? Apakah ada yang bisa saya bantu lebih lanjut?`;
@@ -41,15 +42,20 @@ export const generateAppointmentInvitation = async (lead: Lead, property: Proper
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Buatkan undangan kunjungan properti (show unit/site visit) via WhatsApp dalam Bahasa Indonesia.
+      contents: `Buatkan konfirmasi jadwal kunjungan properti (Site Visit) via WhatsApp yang formal dan antusias.
       
       Detail:
-      Nama Lead: ${lead.name}
-      Properti: ${property.title}
+      Calon Pembeli: ${lead.name}
+      Unit Properti: ${property.title}
       Lokasi: ${property.location}
       Waktu: ${date}, Jam ${time}
       
-      Buat pesan yang mengonfirmasi jadwal ini, memberikan instruksi titik temu singkat, dan tanyakan apakah mereka butuh share location. Gunakan nada yang antusias dan profesional.`,
+      Pesan harus mencakup:
+      - Kalimat pembuka yang menyenangkan.
+      - Konfirmasi ulang waktu dan lokasi.
+      - Info singkat titik temu (misalnya di Marketing Gallery).
+      - Tanyakan apakah mereka memerlukan petunjuk arah (Google Maps).
+      - Emoji rumah, kalender, dan senyum.`,
     });
     
     return response.text || `Halo ${lead.name}, mengonfirmasi jadwal kunjungan unit ${property.title} pada ${appointment.dateTime}. Sampai jumpa di lokasi!`;
@@ -64,14 +70,18 @@ export const generatePropertyAdCopy = async (property: Property) => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Buatkan deskripsi pemasaran yang menarik untuk landing page properti berikut:
+      contents: `Buatkan naskah pemasaran properti mewah dan persuasif untuk landing page.
       
-      Judul: ${property.title}
+      Properti: ${property.title}
       Lokasi: ${property.location}
-      Spesifikasi: ${property.beds}KT, ${property.baths}KM, Luas ${property.sqft}m2
-      Deskripsi Dasar: ${property.description}
+      Spesifikasi Utama: ${property.beds}KT, ${property.baths}KM, ${property.sqft}m2
       
-      Buat dalam 3 paragraf: Keunggulan lokasi, Kualitas bangunan, dan Kesempatan investasi.`,
+      Struktur Output (3 paragraf):
+      Paragraf 1: Gaya Hidup & Prestise (Gambarkan betapa bangganya tinggal di sini).
+      Paragraf 2: Detail Arsitektur & Kenyamanan (Fokus pada spesifikasi dan kualitas).
+      Paragraf 3: Urgensi & Investasi (Gambarkan bahwa ini adalah peluang langka).
+      
+      Gunakan Bahasa Indonesia yang elegan, menggugah emosi, dan "high-converting".`,
     });
     
     return response.text || property.description;
