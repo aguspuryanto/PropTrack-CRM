@@ -7,7 +7,7 @@ interface LandingPageManagerProps {
   properties: Property[];
   onUpdateProperty: (prop: Property) => void;
   onDeleteProperty: (id: string) => void;
-  onAddProperty: (prop: Omit<Property, 'id'>) => void;
+  onAddProperty: (prop: Omit<Property, 'id' | 'agentId'>) => void;
 }
 
 const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onUpdateProperty, onDeleteProperty, onAddProperty }) => {
@@ -15,6 +15,7 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
   const [editingProp, setEditingProp] = useState<Property | null>(null);
 
   const getBaseUrl = () => {
+    // Robust way to get the base URL before the hash in hash-router environments
     return window.location.href.split('#')[0];
   };
 
@@ -109,7 +110,7 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
                         </button>
                         <Link 
                           to={`/listing/${prop.id}`}
-                          target="_self"
+                          target="_blank"
                           className="p-2 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-all"
                           title="Buka Landing Page"
                         >
