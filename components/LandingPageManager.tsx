@@ -109,7 +109,7 @@ const LandingPageManager: React.FC<LandingPageManagerProps> = ({ properties, onU
                         </button>
                         <Link 
                           to={`/listing/${prop.id}`}
-                          target="_blank"
+                          target="_self"
                           className="p-2 text-green-600 bg-green-50 rounded-lg hover:bg-green-100 transition-all"
                           title="Buka Landing Page"
                         >

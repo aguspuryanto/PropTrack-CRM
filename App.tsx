@@ -12,7 +12,6 @@ import Auth from './components/Auth';
 import { Lead, LeadStatus, Property, Appointment, AppointmentStatus, User, UserRole } from './types';
 import { INITIAL_PROPERTIES, INITIAL_LEADS, INITIAL_APPOINTMENTS } from './constants';
 
-// Fix: Helper component to protect routes defined with explicit children typing
 const ProtectedRoute: React.FC<{ user: User | null; children: React.ReactNode }> = ({ user, children }) => {
   if (!user) return <Navigate to="/auth" />;
   return <>{children}</>;
@@ -22,7 +21,6 @@ const AppContent: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const location = useLocation();
   
-  // Load data from localStorage or fallback to initial constants
   const [leads, setLeads] = useState<Lead[]>(() => {
     const saved = localStorage.getItem('proptrack_leads');
     return saved ? JSON.parse(saved) : INITIAL_LEADS;
@@ -41,7 +39,6 @@ const AppContent: React.FC = () => {
   const [scheduleModalLead, setScheduleModalLead] = useState<Lead | null>(null);
   const [scheduleData, setScheduleData] = useState({ date: '', time: '', notes: '' });
 
-  // Sync state to localStorage
   useEffect(() => {
     localStorage.setItem('proptrack_leads', JSON.stringify(leads));
   }, [leads]);
@@ -54,13 +51,11 @@ const AppContent: React.FC = () => {
     localStorage.setItem('proptrack_appointments', JSON.stringify(appointments));
   }, [appointments]);
 
-  // Auth persistence
   useEffect(() => {
     const savedUser = localStorage.getItem('proptrack_user');
     if (savedUser) setCurrentUser(JSON.parse(savedUser));
   }, []);
 
-  // Listen for changes from other tabs (like Landing Page submissions)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'proptrack_leads' && e.newValue) setLeads(JSON.parse(e.newValue));
@@ -162,18 +157,18 @@ const AppContent: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-50">
       <Navigation user={currentUser} onLogout={handleLogout} />
       <main className="flex-grow">
         <Routes>
-          {/* PUBLIC ROUTES */}
+          {/* PUBLIC LANDING PAGE ROUTE - PRIORITIZED */}
           <Route path="/listing/:id" element={
             <PropertyLandingPage properties={properties} onAddLead={handleAddLead} />
           } />
           
           <Route path="/auth" element={!currentUser ? <Auth onLogin={handleLogin} /> : <Navigate to="/" />} />
 
-          {/* PROTECTED CRM ROUTES */}
+          {/* CRM DASHBOARD ROUTES */}
           <Route path="/" element={
             <ProtectedRoute user={currentUser}>
               <div className="max-w-7xl mx-auto px-4 py-8">
@@ -214,47 +209,52 @@ const AppContent: React.FC = () => {
             </ProtectedRoute>
           } />
 
+          {/* CATCH ALL */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
       
+      {/* Schedule Modal Overlay */}
       {scheduleModalLead && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-slideUp">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-50/30">
               <h3 className="text-xl font-bold text-gray-900">Jadwalkan Kunjungan</h3>
-              <button onClick={() => setScheduleModalLead(null)} className="text-gray-400 hover:text-gray-600"><i className="fas fa-times text-xl"></i></button>
+              <button onClick={() => setScheduleModalLead(null)} className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-white transition-all"><i className="fas fa-times text-xl"></i></button>
             </div>
             <form onSubmit={handleCreateAppointment} className="p-6 space-y-4">
-              <div className="bg-indigo-50 p-4 rounded-xl">
-                <p className="text-xs text-indigo-600 font-bold uppercase mb-1">Lead</p>
-                <p className="font-semibold text-gray-900">{scheduleModalLead.name}</p>
+              <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <p className="text-[10px] text-indigo-600 font-black uppercase tracking-widest mb-1">Calon Pembeli</p>
+                <p className="font-bold text-gray-900">{scheduleModalLead.name}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Tanggal</label>
+                  <input required type="date" value={scheduleData.date} onChange={e => setScheduleData({...scheduleData, date: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Waktu</label>
+                  <input required type="time" value={scheduleData.time} onChange={e => setScheduleData({...scheduleData, time: e.target.value})} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm" />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                <input required type="date" value={scheduleData.date} onChange={e => setScheduleData({...scheduleData, date: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500" />
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 ml-1">Instruksi Khusus</label>
+                <textarea rows={2} value={scheduleData.notes} onChange={e => setScheduleData({...scheduleData, notes: e.target.value})} placeholder="Titik temu, parkir, dll..." className="w-full px-4 py-2.5 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500 text-sm resize-none"></textarea>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Waktu</label>
-                <input required type="time" value={scheduleData.time} onChange={e => setScheduleData({...scheduleData, time: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
-                <textarea rows={2} value={scheduleData.notes} onChange={e => setScheduleData({...scheduleData, notes: e.target.value})} placeholder="Instruksi khusus..." className="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
-              </div>
-              <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setScheduleModalLead(null)} className="flex-1 px-4 py-3 rounded-xl border border-gray-200 font-bold text-gray-600">Batal</button>
-                <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 font-bold text-white shadow-lg shadow-indigo-100">Konfirmasi</button>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setScheduleModalLead(null)} className="flex-1 px-4 py-3 rounded-xl border border-gray-200 font-bold text-gray-600 text-sm hover:bg-gray-50 transition-all">Batal</button>
+                <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 font-bold text-white shadow-lg shadow-indigo-100 text-sm active:scale-95 transition-all">Konfirmasi</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* CRM Global Footer */}
       {currentUser && !location.pathname.startsWith('/listing/') && (
         <footer className="bg-white border-t border-gray-200 py-8 text-center text-sm text-gray-500">
           <div className="max-w-7xl mx-auto px-4">
-            <p>&copy; {new Date().getFullYear()} PropTrack CRM. Solusi Terpercaya Agen Properti.</p>
+            <p className="font-medium">&copy; {new Date().getFullYear()} PropTrack CRM. Professional Property Management Solution.</p>
           </div>
         </footer>
       )}

@@ -1,7 +1,5 @@
 {
   "name": "PropTrack CRM - Solusi Penjualan Properti",
   "description": "Sistem CRM Properti komprehensif untuk mengelola inventaris, melacak prospek (leads), dan otomatisasi follow-up WhatsApp.",
-  "requestFramePermissions": [
-    "camera"
-  ]
+  "requestFramePermissions": []
 }

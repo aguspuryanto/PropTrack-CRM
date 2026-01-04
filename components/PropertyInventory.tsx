@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 interface PropertyInventoryProps {
   properties: Property[];
-  // Fix: Updated type to match App.tsx signature which omits agentId (handled in App)
   onAddProperty: (prop: Omit<Property, 'id' | 'agentId'>) => void;
   onUpdateProperty: (prop: Property) => void;
   onDeleteProperty: (id: string) => void;
@@ -83,13 +82,11 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
     };
 
     if (editingId) {
-      // Fix: Find existing property to preserve its agentId
       const existingProp = properties.find(p => p.id === editingId);
       if (existingProp) {
         onUpdateProperty({ ...existingProp, ...propData });
       }
     } else {
-      // Fix: propData now correctly matches Omit<Property, 'id' | 'agentId'>
       onAddProperty(propData);
     }
 
@@ -97,7 +94,7 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Inventaris Properti</h1>
@@ -116,7 +113,7 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
           <div key={prop.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full group hover:shadow-xl transition-all duration-300">
             <div className="relative h-48 overflow-hidden">
               <img src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-indigo-600 shadow-sm uppercase tracking-wide">
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black text-indigo-600 shadow-sm uppercase tracking-widest">
                 {prop.status}
               </div>
               <div className="absolute top-4 right-4 flex gap-2">
@@ -136,8 +133,8 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
             </div>
             <div className="p-6 flex-1 flex flex-col">
               <h3 className="text-lg font-bold text-gray-900 mb-1 leading-tight">{prop.title}</h3>
-              <p className="text-sm text-gray-500 mb-4 flex items-center gap-1">
-                <i className="fas fa-map-marker-alt text-xs"></i> {prop.location}
+              <p className="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                <i className="fas fa-map-marker-alt text-[10px]"></i> {prop.location}
               </p>
               
               <div className="flex justify-between items-center mb-6 py-3 border-y border-gray-50">
@@ -157,7 +154,7 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
 
               <div className="mt-auto">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm text-gray-500">Harga Jual</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Harga Jual</span>
                   <span className="text-lg font-bold text-indigo-600">Rp {(prop.price / 1000000).toFixed(1)} jt</span>
                 </div>
                 
@@ -165,7 +162,7 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
                   <Link 
                     to={`/listing/${prop.id}`}
                     target="_blank"
-                    className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold text-center hover:bg-gray-200 transition-colors inline-flex items-center justify-center gap-1"
+                    className="bg-slate-100 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold text-center hover:bg-slate-200 transition-colors inline-flex items-center justify-center gap-2"
                   >
                     <i className="fas fa-external-link-alt text-[10px]"></i> Preview LP
                   </Link>
@@ -175,9 +172,9 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
                       navigator.clipboard.writeText(url);
                       alert('Link landing page disalin ke clipboard!');
                     }}
-                    className="bg-indigo-50 text-indigo-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors"
+                    className="bg-indigo-50 text-indigo-600 px-3 py-2 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-colors flex items-center justify-center gap-2"
                   >
-                    <i className="fas fa-share-alt mr-1"></i> Salin Link
+                    <i className="fas fa-share-alt text-[10px]"></i> Salin Link
                   </button>
                 </div>
               </div>
@@ -249,11 +246,11 @@ const PropertyInventory: React.FC<PropertyInventoryProps> = ({ properties, onAdd
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1.5 tracking-wider">Galeri Foto</label>
-                  <textarea rows={2} value={formData.galleryRaw} onChange={e => setFormData({...formData, galleryRaw: e.target.value})} className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-xs resize-none"></textarea>
+                  <textarea rows={2} value={formData.galleryRaw} onChange={e => setFormData({...formData, galleryRaw: e.target.value})} placeholder="Satu URL per baris..." className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 outline-none text-xs resize-none"></textarea>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-2">
+              <div className="flex gap-3 pt-4 sticky bottom-0 bg-white pb-2 border-t border-slate-50 mt-4">
                 <button type="button" onClick={resetForm} className="flex-1 px-4 py-3 rounded-xl border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-colors text-sm">Batal</button>
                 <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95 text-sm">
                   {editingId ? 'Simpan Perubahan' : 'Simpan Unit'}
