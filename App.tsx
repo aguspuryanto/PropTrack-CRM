@@ -8,6 +8,7 @@ import PropertyInventory from './components/PropertyInventory';
 import PropertyLandingPage from './components/PropertyLandingPage';
 import CalendarManager from './components/CalendarManager';
 import LandingPageManager from './components/LandingPageManager';
+import EditLandingPage from './components/EditLandingPage';
 import Auth from './components/Auth';
 import { Lead, LeadStatus, Property, Appointment, AppointmentStatus, User, UserRole } from './types';
 import { INITIAL_PROPERTIES, INITIAL_LEADS, INITIAL_APPOINTMENTS } from './constants';
@@ -161,7 +162,7 @@ const AppContent: React.FC = () => {
       <Navigation user={currentUser} onLogout={handleLogout} />
       <main className="flex-grow">
         <Routes>
-          {/* PUBLIC LANDING PAGE ROUTE - PRIORITIZED */}
+          {/* PUBLIC LANDING PAGE ROUTE */}
           <Route path="/listing/:id" element={
             <PropertyLandingPage properties={properties} onAddLead={handleAddLead} />
           } />
@@ -198,6 +199,12 @@ const AppContent: React.FC = () => {
               <div className="max-w-7xl mx-auto px-4 py-8">
                 <LandingPageManager properties={getFilteredProperties()} onUpdateProperty={handleUpdateProperty} onDeleteProperty={handleDeleteProperty} onAddProperty={handleAddProperty} />
               </div>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/landing-pages/edit/:id" element={
+            <ProtectedRoute user={currentUser}>
+              <EditLandingPage properties={getFilteredProperties()} onUpdateProperty={handleUpdateProperty} />
             </ProtectedRoute>
           } />
 
